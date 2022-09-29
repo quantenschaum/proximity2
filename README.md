@@ -15,11 +15,17 @@ The `proximity2` integration is a fork of the [core `proximity` integration](htt
 
 It calculates the distance of the tracked entities (devices) to a monitored zone, and it also calculates the direction of motion. This allows to trigger automations on an entity approaching the zone.
 
-## installation
+## Use cases
+
+This integration is useful to reduce the number of automation rules required when wanting to perform automations based on locations outside a particular zone. The [triggers](/getting-started/automation-trigger/ needed when factors such as direction of travel need to be taken into account are much simple with this integration.
+
+- turn on heating as you approach home
+- turn off heating when more than 5km away from home
+## Installation
 
 Copy all files into the `custom_components/proximity2/` dir of your HA installation.
 
-## configuration
+## Configuration
 
 {% configuration %}
 zone:
@@ -58,7 +64,7 @@ unit_of_measurement:
 proximity:
   home: # name of the proximity entity 
     zone: home # name of monitored zone
-    ignored: # list of names of zones, tracked entities are ignored if they are in any if these zone
+    ignored: # list of zone names, tracked entities are ignored if they are in any if these zones
       - work
     devices: # list of ids of entities to track
       - person.bob
@@ -74,11 +80,11 @@ proximity:
       - person.judith
 ```
 
-## distance
+## Distance
 
 The state of a `proximity2` entity contains the distance of the closest tracked entity to the tracked zone (excluding ignored entities).
 
-### calculation
+### Algorithm
 
 For each tracked entity get its state. If the there is no state, ignore the entity. If the state value is in the list of ignored zones, ignore the entity. If any of the remaining entities' state value is equal to the name of the monitored zone, the distance is set to 0 (entity is in tracked zone). Otherwise, get the position (lat,lon) of the entity and calculate the distance to the center of the monitored zone and subtract its radius, but limit the result to 0 (distance is always >0).
 
@@ -88,17 +94,21 @@ The final state value of the proximity entity is the _smallest_ of the calculate
 
 If there is no smallest distance, the state is undefined.
 
-### zone radius
+### Ignored zones
+
+Entities that are in any of the ignored zones do not participate in the distance calculation. It is possible to ignore the monitored zone itself. This allows to get the distance of the closest entity, except the ones that are in the zone.
+
+### Zone radius
 
 The radius is taken from monitored zone. This means, the distance of an entity is 0, if the entity is inside the zone. The distance is the distance of the entity to the border of the zone. 
 
 If you want to get the distance to center of the zone, you may the radius to 0 in configuration. You may also set a radius >0.
 
-### position
+### Positions
 
 The position of an entity is extracted from its lat/lon attributes. If it does not have these attributes, the position is taken from the zone the entity is in. If it is not in a zone, the position cannot be determined, the distance of this entity is undefined, and it is ignored in the distance calculation.
 
-## direction
+## Direction
 
 The direction of motion is derived from the distance (state value of the proximity entity) and stored in the `direction` attribute. Let `d0` be the current distance and `d1` the newly calculated distance value after a tracked entity has changed it state. 
 Then there are 4 possibilities.
@@ -110,14 +120,7 @@ Then there are 4 possibilities.
 
 If `direction == stationary`, then the distance (state value) will _not_ be updated. This allows to ignore small movements of entities.
 
-## example use cases
-
-This integration is useful to reduce the number of automation rules required when wanting to perform automations based on locations outside a particular zone. The [triggers](/getting-started/automation-trigger/ needed when factors such as direction of travel need to be taken into account are much simple with this integration.
-
-- turn on heating as you approach home
-- turn off heating when more than 5km away from home
-
-## state
+## State
 
 The Proximity entity which is created has the following state values:
 
