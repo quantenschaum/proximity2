@@ -3,8 +3,7 @@
   "name": "Proximity2",
   "documentation": "proximity.md",
   "dependencies": ["device_tracker", "zone"],
-  "codeowners": [],
-  "quality_scale": "internal",
+  "codeowners": ["quantenschaum"],
   "iot_class": "calculated",
   "version": "0.1.0"
 }
