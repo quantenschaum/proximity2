@@ -1,0 +1,10 @@
+{
+  "domain": "proximity2",
+  "name": "Proximity2",
+  "documentation": "proximity.md",
+  "dependencies": ["device_tracker", "zone"],
+  "codeowners": [],
+  "quality_scale": "internal",
+  "iot_class": "calculated",
+  "version": "0.1.0"
+}
