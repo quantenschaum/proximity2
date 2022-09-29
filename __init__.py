@@ -1,8 +1,8 @@
 """Support for tracking the proximity of a device."""
 import logging
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
 from homeassistant.const import (
     ATTR_LATITUDE,
     ATTR_LONGITUDE,
@@ -17,7 +17,6 @@ from homeassistant.const import (
     LENGTH_YARD,
 )
 from homeassistant.core import HomeAssistant
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import track_state_change
 from homeassistant.helpers.typing import ConfigType
@@ -62,9 +61,9 @@ def setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
         def update(*a):
             _LOGGER.debug("UPDATE %s", a)
-            proximity.schedule_update_ha_state()
+            proximity.schedule_update_ha_state(True)
 
-        proximity.schedule_update_ha_state()
+        update()
         track_state_change(hass, conf[CONF_DEVICES], update)
 
     return True
@@ -171,6 +170,7 @@ class Proximity(Entity):
 
         if self._direction != "stationary":
             self._dist_to = dist
+
         self._nearest = nearest
 
         _LOGGER.debug("state=%s attr=%s", self.state, self.extra_state_attributes)
