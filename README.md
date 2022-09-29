@@ -13,7 +13,8 @@ ha_integration_type: integration
 
 The `proximity2` integration is a fork of the [core `proximity` integration](https://www.home-assistant.io/integrations/proximity/). The goal of this fork is to make the integration work correctly.
 
-It monitors the distance of the tracked entities (devices) to a zone, and it also calculates their direction of motion. This allows to trigger automations if an entity is approaching to the zone.
+It calculates the distance of the tracked entities (devices) to a monitored zone, and it also calculates the direction of motion. This allows to trigger automations on an entity approaching the zone.
+
 ## installation
 
 Copy all files into the `custom_components/proximity2/` dir of your HA installation.
