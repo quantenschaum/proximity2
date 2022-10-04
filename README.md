@@ -105,7 +105,7 @@ Then there are 4 possibilities.
 - `d0 > d1`: `direction = towards`
 - `d0 < d1`: `direction = away`
 
-If `direction == stationary`, then the distance (state value) will _not_ be updated. This allows to ignore small movements of entities.
+To ignore small movements of entities, the distance (state value) will _only_ be updated, if `direction != stationary or distance == 0`.
 
 ## State
 
