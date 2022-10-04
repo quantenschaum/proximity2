@@ -70,7 +70,7 @@ def setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 class Proximity(Entity):
-    _dist_to = None
+    _distance = None
     _nearest = None
     _direction = None
     _attr_icon = "mdi:compass"
@@ -95,7 +95,9 @@ class Proximity(Entity):
 
     @property
     def state(self):
-        return self.convert(self._dist_to)
+        if self._distance == 0:
+            return 0
+        return self.convert(self._distance)
 
     @property
     def extra_state_attributes(self):
@@ -110,6 +112,7 @@ class Proximity(Entity):
         if state:
             pos = state.attributes.get(ATTR_LATITUDE), state.attributes.get(ATTR_LONGITUDE)
             if all(v is not None for v in pos):
+                _LOGGER.debug("pos=%s %s %s", pos, entity_id, state.attributes.get("source") or "")
                 return pos
             else:
                 return self.position(f"zone.{state.state}")
@@ -126,12 +129,13 @@ class Proximity(Entity):
         return 0
 
     def distance(self, pos):
-        if isinstance(pos, str):
-            pos = self.position(pos)
+        pos = self.position(pos) if isinstance(pos, str) else pos
         zone_pos = self.position(self._zone_id)
         if pos and zone_pos:
-            _LOGGER.debug("distance=%s radius=%s", distance(*zone_pos, *pos), self.radius)
-            return max(0, distance(*zone_pos, *pos) - self.radius)
+            d0 = distance(*zone_pos, *pos)
+            d = max(0, d0 - self.radius)
+            _LOGGER.debug("distance=%s-%s->%s", d0, self.radius, d)
+            return d
 
     def update(self):
         _LOGGER.debug("update %s", self.name)
@@ -150,13 +154,12 @@ class Proximity(Entity):
                     _LOGGER.debug("in this zone")
                     dist, nearest = 0, dev_name
                     break
-                _LOGGER.debug("pos=%s", self.position(dev))
                 d = self.distance(dev)
                 _LOGGER.debug("dist=%s", d)
                 if not dist or d and d < dist:
                     dist, nearest = d, dev_name
 
-        change = dist - self._dist_to if all(v is not None for v in [dist, self._dist_to]) else None
+        change = dist - self._distance if all(v is not None for v in [dist, self._distance]) else None
         _LOGGER.debug("nearest=%s dist=%s change=%s", nearest, dist, change)
 
         if change is None:
@@ -168,8 +171,8 @@ class Proximity(Entity):
         elif change > 0:
             self._direction = "away"
 
-        if self._direction != "stationary":
-            self._dist_to = dist
+        if self._direction != "stationary" or dist == 0:
+            self._distance = dist
 
         self._nearest = nearest
 
