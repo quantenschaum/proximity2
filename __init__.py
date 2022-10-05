@@ -56,17 +56,21 @@ CONFIG_SCHEMA = vol.Schema({CONF_BASE: cv.schema_with_slug_keys(ZONE_SCHEMA)}, e
 def setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Get the zones and offsets from configuration.yaml."""
     for name, conf in config[CONF_BASE].items():
-        _LOGGER.debug("setup %s %s", name, conf)
-        proximity = Proximity(hass, name, conf)
-
-        def update(*a):
-            _LOGGER.debug("UPDATE %s", a)
-            proximity.schedule_update_ha_state(True)
-
-        update()
-        track_state_change(hass, conf[CONF_DEVICES], update)
+        setup_entity(hass, name, conf)
 
     return True
+
+
+def setup_entity(hass, name, conf):
+    _LOGGER.debug("setup %s %s", name, conf)
+    proximity = Proximity(hass, name, conf)
+
+    def update(*a):
+        _LOGGER.debug("UPDATE %s %s", name, a)
+        proximity.schedule_update_ha_state(True)
+
+    update()
+    track_state_change(hass, conf[CONF_DEVICES], update)
 
 
 class Proximity(Entity):
