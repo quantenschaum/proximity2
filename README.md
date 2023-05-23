@@ -4,10 +4,11 @@ It calculates the distance of the tracked entities (devices) to a monitored zone
 
 ## Use cases
 
-This integration is useful to reduce the number of automation rules required when wanting to perform automations based on locations outside a particular zone. The [triggers](/getting-started/automation-trigger/ needed when factors such as direction of travel need to be taken into account are much simple with this integration.
+This integration is useful to reduce the number of automation rules required when wanting to perform automations based on locations outside a particular zone. The [triggers](https://www.home-assistant.io/docs/automation/trigger/) needed when factors such as direction of travel need to be taken into account are much simpler with this integration.
 
 - turn on heating as you approach home
 - turn off heating when more than 5km away from home
+
 ## Installation
 
 Copy all files into the `custom_components/proximity2/` dir of your HA installation.
